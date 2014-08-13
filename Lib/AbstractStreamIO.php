@@ -12,11 +12,8 @@ abstract class AbstractStreamIO
 
     protected function __destruct()
     {
-        $this->_close();
         unset($this->_analysis);
     }
-
-    abstract protected _close();
 
     abstract public read($length, $offset = 0, $whence = SEEK_CUR)
     abstract public write($buffer, $offset = 0, $whence = SEEK_CUR)

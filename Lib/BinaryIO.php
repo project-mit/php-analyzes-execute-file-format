@@ -20,10 +20,6 @@ class BinaryIO extends AbstractStreamIO
         parent::__destruct();
     }
 
-    protected function _close()
-    {
-    }
-
     public function read($length, $offset = 0, $whence = SEEK_CUR)
     {
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);

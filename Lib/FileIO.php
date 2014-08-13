@@ -17,12 +17,11 @@ class FileIO extends AbstractStreamIO
 
     public function __destruct()
     {
-        parent::__destruct();
-    }
+        // if $fileobject is resource, file pointer close!!
+        if (is_resource($this->_analysis) === true)
+            fclose($this->_analysis);
 
-    protected function _close()
-    {
-        fclose($this->_analysis);
+        parent::__destruct();
     }
 
     public function read($length, $offset = 0, $whence = SEEK_CUR)
