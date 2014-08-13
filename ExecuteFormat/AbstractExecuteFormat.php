@@ -1,5 +1,5 @@
 <?php
-namespace PHPSecurityUploader;
+namespace PHPSecurityUploader\ExecuteFormat;
 
 use PHPSecurityUploader\Lib;
 
@@ -7,7 +7,7 @@ class AbstractExecuteFormat
 {
     protected $_streamio = null;
 
-    protected function __construct($streamio)
+    protected function __construct(AbstractStreamIO $streamio)
     {
         if (is_object($streamio) === false)
             throw new BadMethodCallException('The parameter is not objects of class.');
