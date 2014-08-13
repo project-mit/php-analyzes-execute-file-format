@@ -14,3 +14,4 @@ This software is distributed under MIT Licence.
 3. Analysis for the extension name
 4. Get to the machine commands and assembly codes in the specific function.
 5. Searching string list of the windows-execute-file.
+6. The Execute File Format of Linux(ELF File Format) will be support.
