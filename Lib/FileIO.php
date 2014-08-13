@@ -12,12 +12,12 @@ class FileIO extends AbstractStreamIO
         if (is_resource($fileobject) === false)
             throw new InvalidException('The parameter is not file resource.');
 
-        parent::__constract($fileobject);
+        parent::__construct($fileobject);
     }
 
     public function __destruct()
     {
-        parent::__destract();
+        parent::__destruct();
     }
 
     protected function _close()

@@ -3,9 +3,9 @@ namespace PHPSecurityUploader\Exception;
 
 class IOException extends Exception
 {
-    public function __construct($message, $code = 0, Exception $previous = null)
+    public function __construct($message, Exception $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, 0, $previous);
     }
 }
 ?>
