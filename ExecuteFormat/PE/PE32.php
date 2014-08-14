@@ -1,8 +1,8 @@
 <?php
 namespace PHPSecurityUploader\ExecuteFormat\PE;
 
-use PHPSecurityUploader\Lib;
-use PHPSecurityUploader\ExecuteFormat;
+use PHPSecurityUploader\Lib,
+    PHPSecurityUploader\ExecuteFormat;
 
 class PE32 extends AbstractExecuteFormat
 {
@@ -17,6 +17,11 @@ class PE32 extends AbstractExecuteFormat
     public function __destruct()
     {
         parent::__destruct();
+    }
+
+    public function is_pe()
+    {
+        
     }
 }
 ?>

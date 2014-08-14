@@ -1,8 +1,8 @@
 <?php
 namespace PHPSecurityUploader\ExecuteFormat\ELF;
 
-use PHPSecurityUploader\Lib;
-use PHPSecurityUploader\ExecuteFormat;
+use PHPSecurityUploader\Lib,
+    PHPSecurityUploader\ExecuteFormat;
 
 class ELF64 extends AbstractExecuteFormat
 {

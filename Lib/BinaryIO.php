@@ -1,8 +1,8 @@
 <?php
 namespace PHPSecurityUploader\Lib\StreamIO;
 
-use PHPSecurityUploader\Lib;
-use PHPSecurityUploader\Exception;
+use PHPSecurityUploader\Lib,
+    PHPSecurityUploader\Exception;
 
 class BinaryIO extends AbstractStreamIO
 {
