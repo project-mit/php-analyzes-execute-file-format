@@ -15,7 +15,7 @@ abstract class AbstractStreamIO
         unset($this->_analysis);
     }
 
-    abstract public read($length, $offset = 0, $whence = SEEK_CUR)
-    abstract public write($buffer, $offset = 0, $whence = SEEK_CUR)
+    abstract public read($length, $offset = 0, $whence = SEEK_CUR);
+    abstract public write($buffer, $offset = 0, $whence = SEEK_CUR);
 }
 ?>

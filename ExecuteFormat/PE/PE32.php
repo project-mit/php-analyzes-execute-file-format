@@ -18,10 +18,5 @@ class PE32 extends AbstractExecuteFormat
     {
         parent::__destruct();
     }
-
-    public function is_pe()
-    {
-        
-    }
 }
 ?>
