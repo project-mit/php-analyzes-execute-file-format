@@ -1,5 +1,5 @@
 <?php
-namespace PHPSecurityUploader\Exception;
+namespace AnalyzesExecuteFileFormat\Exception;
 
 class InvalidException extends Exception
 {

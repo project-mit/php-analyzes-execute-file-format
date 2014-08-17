@@ -1,5 +1,5 @@
 <?php
-namespace PHPSecurityUploader\ExecuteFormat\PE\32;
+namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE\32;
 
 class ImageDataDirectory
 {

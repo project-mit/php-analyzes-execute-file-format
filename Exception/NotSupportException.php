@@ -1,5 +1,5 @@
 <?php
-namespace PHPSecurityUploader\Exception;
+namespace AnalyzesExecuteFileFormat\Exception;
 
 class NotSupportException extends Exception
 {

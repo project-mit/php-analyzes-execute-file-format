@@ -1,5 +1,5 @@
 <?php
-namespace PHPSecurityUploader\Lib;
+namespace AnalyzesExecuteFileFormat\Lib;
 
 abstract class AbstractStreamIO
 {

@@ -1,8 +1,8 @@
 <?php
-namespace PHPSecurityUploader\ExecuteFormat\PE;
+namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
 
-use PHPSecurityUploader\Lib,
-    PHPSecurityUploader\ExecuteFormat;
+use AnalyzesExecuteFileFormat\Lib,
+    AnalyzesExecuteFileFormat\ExecuteFormat;
 
 class PE64 extends AbstractExecuteFormat
 {

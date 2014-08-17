@@ -1,7 +1,7 @@
 <?php
-namespace PHPSecurityUploader\ExecuteFormat;
+namespace AnalyzesExecuteFileFormat\ExecuteFormat;
 
-use PHPSecurityUploader\Lib;
+use AnalyzesExecuteFileFormat\Lib;
 
 class AbstractExecuteFormat
 {

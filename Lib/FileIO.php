@@ -1,8 +1,8 @@
 <?php
-namespace PHPSecurityUploader\Lib\StreamIO;
+namespace AnalyzesExecuteFileFormat\Lib\StreamIO;
 
-use PHPSecurityUploader\Lib,
-    PHPSecurityUploader\Exception;
+use AnalyzesExecuteFileFormat\Lib,
+    AnalyzesExecuteFileFormat\Exception;
 
 class FileIO extends AbstractStreamIO
 {
