@@ -1,5 +1,5 @@
 <?php
-namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE\32;
+namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
 
 class ImageSectionHeader
 {

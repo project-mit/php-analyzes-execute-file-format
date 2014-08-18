@@ -1,5 +1,5 @@
 <?php
-namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE\32;
+namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
 
 class ImageDataDirectory
 {
@@ -23,3 +23,4 @@ class ImageDataDirectory
     public $virtualAddress;
     public $size;
 }
+?>

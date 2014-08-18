@@ -1,14 +1,14 @@
 <?php
-namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
+namespace AnalyzesExecuteFileFormat\ExecuteFormat\ELF;
 
 use AnalyzesExecuteFileFormat\Lib,
     AnalyzesExecuteFileFormat\ExecuteFormat;
 
-class PE32 extends AbstractExecuteFormat
+class Bit64 extends AbstractExecuteFormat
 {
     public function __construct(AbstractStreamIO $streamio)
     {
-        // not supported PE 32bit mode
+        // not supported ELF 64bit mode
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
 
         parent::__construct($streamio);
