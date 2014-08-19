@@ -1,7 +1,9 @@
 <?php
 namespace AnalyzesExecuteFileFormat\ExecuteFormat;
 
-use AnalyzesExecuteFileFormat\Lib;
+use AnalyzesExecuteFileFormat\Exception\BadMethodCallException;
+
+use AnalyzesExecuteFileFormat\Lib\StreamIO\AbstractStreamIO;
 
 class AbstractExecuteFormat
 {

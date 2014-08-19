@@ -1,8 +1,8 @@
 <?php
 namespace AnalyzesExecuteFileFormat\Lib\StreamIO;
 
-use AnalyzesExecuteFileFormat\Lib,
-    AnalyzesExecuteFileFormat\Exception;
+use AnalyzesExecuteFileFormat\Exception\InvalidException,
+    AnalyzesExecuteFileFormat\Exception\NotSupportException;
 
 class BinaryIO extends AbstractStreamIO
 {
@@ -23,9 +23,28 @@ class BinaryIO extends AbstractStreamIO
     public function read($length, $offset = 0, $whence = SEEK_CUR)
     {
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
+
+        return $this;
     }
 
-    public function write($buffer, $offset = 0, $whence = SEEK_CUR)
+    public function write(string $buffer, $offset = 0, $whence = SEEK_CUR)
+    {
+        throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
+
+        return $this;
+    }
+
+    public function toString()
+    {
+        throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
+    }
+
+    public function toInteger()
+    {
+        throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
+    }
+
+    public function toIntArray($valueSize = 1)
     {
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
     }

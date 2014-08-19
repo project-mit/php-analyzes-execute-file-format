@@ -1,5 +1,5 @@
 <?php
-namespace AnalyzesExecuteFileFormat\Lib;
+namespace AnalyzesExecuteFileFormat\Lib\StreamIO;
 
 abstract class AbstractStreamIO
 {
@@ -15,7 +15,11 @@ abstract class AbstractStreamIO
         unset($this->_analysis);
     }
 
-    abstract public read($length, $offset = 0, $whence = SEEK_CUR);
-    abstract public write($buffer, $offset = 0, $whence = SEEK_CUR);
+    abstract public function read($length, $offset = 0, $whence = SEEK_CUR);
+    abstract public function write(string $buffer, $offset = 0, $whence = SEEK_CUR);
+
+    abstract public function toString();
+    abstract public function toInteger();
+    abstract public function toIntArray($valueSize = 1);
 }
 ?>

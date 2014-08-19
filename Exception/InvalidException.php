@@ -1,7 +1,10 @@
 <?php
 namespace AnalyzesExecuteFileFormat\Exception;
 
-class InvalidException extends Exception
+use Exception,
+    RuntimeException;
+
+class InvalidException extends RuntimeException
 {
     public function __construct($message, Exception $previous = null)
     {

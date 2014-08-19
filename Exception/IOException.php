@@ -1,7 +1,10 @@
 <?php
 namespace AnalyzesExecuteFileFormat\Exception;
 
-class IOException extends Exception
+use Exception,
+    RuntimeException;
+
+class IOException extends RuntimeException
 {
     public function __construct($message, Exception $previous = null)
     {

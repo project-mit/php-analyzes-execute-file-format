@@ -1,11 +1,16 @@
 <?php
 namespace AnalyzesExecuteFileFormat\Lib\StreamIO;
 
-use AnalyzesExecuteFileFormat\Lib,
-    AnalyzesExecuteFileFormat\Exception;
+use AnalyzesExecuteFileFormat\Exception;
 
 class FileIO extends AbstractStreamIO
 {
+    const LITTLE_ENDIAN = 0;
+    const BIG_ENDIAN = 1;
+
+    private $__data = '';
+    private $__endian = 0;
+
     public function __construct($fileobject)
     {
         // if $fileobject of parameter is not resource, throw exception!!
@@ -24,6 +29,16 @@ class FileIO extends AbstractStreamIO
         parent::__destruct();
     }
 
+    public function setEndian($endian)
+    {
+        if (true === is_integer($endian))
+        {
+            $this->__endian = $endian;
+            return $this;
+        }
+        return null;
+    }
+
     public function read($length, $offset = 0, $whence = SEEK_CUR)
     {
         // move to file pointer
@@ -35,11 +50,13 @@ class FileIO extends AbstractStreamIO
 
         // read to data of file
         $buffer = '';
-        if (($buffer = fread($this->_analysis, $length) !== false)
-            return $buffer;
+        if (($buffer = fread($this->_analysis, $length)) !== false)
+            $this->__data = $buffer;
+
+        return $this;
     }
 
-    public function write($buffer, $offset = 0, $whence = SEEK_CUR)
+    public function write(string $buffer, $offset = 0, $whence = SEEK_CUR)
     {
         // null buffer
         if ($buffer === null) return false;
@@ -53,6 +70,39 @@ class FileIO extends AbstractStreamIO
             throw new IOException($writelength . ' bytes from ' . strlen($buffer) . ' bytes was written to successful.');
 
         return $writelength;
+    }
+
+    public function toString()
+    {
+        return $this->__data;
+    }
+
+    public function toInteger()
+    {
+        $binary = $this->__data;
+        if ($this->__endian === self::LITTLE_ENDIAN)
+            $binary = strrev($binary);
+
+        return unpack('n*', $binary)[1];
+    }
+
+    public function toIntArray($valueSize = 1)
+    {
+        $binarys = str_split($this->__data, $valueSize);
+        if ($this->__endian === self::LITTLE_ENDIAN)
+        {
+            $binarys = array_map(
+                function ($binary)
+                {
+                    if ($this->__endian === self::LITTLE_ENDIAN)
+                        $binary = strrev($binary);
+
+                    return unpack('H*', $binary)[1];
+                },
+                $binarys
+            );
+        }
+        return array_map('hexdec', $binarys);
     }
 }
 ?>

@@ -1,7 +1,10 @@
 <?php
 namespace AnalyzesExecuteFileFormat\Exception;
 
-class NotSupportException extends Exception
+use Exception,
+    RuntimeException;
+
+class NotSupportException extends RuntimeException
 {
     public function __construct($method, Exception $previous = null)
     {
