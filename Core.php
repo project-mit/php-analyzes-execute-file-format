@@ -18,6 +18,8 @@ require(__DIR__ . '/ExecuteFormat/PE/ImageOptionalHeader.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageFileHeader.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageDataDirectory.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageSectionHeader.php');
+require(__DIR__ . '/ExecuteFormat/PE/ImageImportDescriptor.php');
+require(__DIR__ . '/ExecuteFormat/PE/ImageImportByName.php');
 require(__DIR__ . '/ExecuteFormat/PE/Bit32.php');
 require(__DIR__ . '/ExecuteFormat/PE/Bit64.php');
 // ExecuteFormat\ELF Classes

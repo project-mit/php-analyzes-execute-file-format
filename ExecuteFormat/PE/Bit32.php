@@ -135,10 +135,86 @@ class Bit32 extends AbstractExecuteFormat
             $header->numberOfLineNumbers = $this->_streamio->read(2)->toInteger();
             $header->characteristics = $this->_streamio->read(4)->toInteger();
 
+            // get value to RVA of import address table
+            if ($header->sizeOfRawData < $header->misc['virtualSize'])
+            {
+                $header->sizeOfRawData = ($header->misc['virtualSize'] - $header->misc['virtualSize'] % $ntHeader->optionalheader->fileAlignment) + $ntHeader->optionalheader->fileAlignment;
+            }
+
             $headerArray[$i] = $header;
         }
 
         return $headerArray;
+    }
+
+    public function getImageImportDescriptors(ImageNtHeaders &$ntHeader = null, array &$sectionHeader = null)
+    {
+        if ($ntHeader === null)
+            $ntHeader = $this->getImageNtHeaders();
+
+        if ($sectionHeader === null)
+            $sectionHeader = $this->getImageSectionHeader($ntHeader);
+
+        // get value to RVA of import address table
+        $iatInfo = $ntHeader->optionalheader->dataDirectory[ImageDataDirectory::IMPORT_DIRECTORY];
+        foreach ($sectionHeader as $index => $section)
+        {
+            if ($iatInfo->virtualAddress >= $section->virtualAddress &&
+                $iatInfo->virtualAddress <  $section->virtualAddress + $section->misc['virtualSize'])
+            {
+                // move file offset to Import Address Table
+                $iatRAW = $iatInfo->virtualAddress - $section->virtualAddress + $section->pointerToRawData;
+                $this->_streamio->read(0, $iatRAW);
+
+                // get to length of Import Address Table
+                $iatSections = $iatInfo->size / 20 - 1;
+                $importDescriptorArray = array();
+                for ($i = 0; $i < $iatSections; $i++)
+                {
+                    $importDescriptor = new ImageImportDescriptor();
+                    $importDescriptor->dummyUnionName['characteristics'] = $this->_streamio->read(4)->toInteger();
+                    $importDescriptor->dummyUnionName['originalFirstThunk'] = $importDescriptor->dummyUnionName['characteristics'];
+                    $importDescriptor->timeDateStamp = $this->_streamio->read(4)->toInteger();
+                    $importDescriptor->forwarderChain = $this->_streamio->read(4)->toInteger();
+                    $importDescriptor->name = $this->_streamio->read(4)->toInteger();
+                    $importDescriptor->firstThunk = $this->_streamio->read(4)->toInteger();
+
+                    // RVA -> RAW
+                    $importDescriptor->dummyUnionName['originalFirstThunk'] -= $section->virtualAddress;
+                    $importDescriptor->dummyUnionName['originalFirstThunk'] += $section->pointerToRawData;
+                    $importDescriptor->name -= $section->virtualAddress;
+                    $importDescriptor->name += $section->pointerToRawData;
+                    $importDescriptor->firstThunk -= $section->virtualAddress;
+                    $importDescriptor->firstThunk += $section->pointerToRawData;
+
+                    $importDescriptorArray[$i] = $importDescriptor;
+                }
+
+                return $importDescriptorArray;
+            }
+        }
+        return null;
+    }
+
+    public function getListOfImportDLL(array &$importDescriptorArray = null)
+    {
+        if ($importDescriptorArray === null)
+            $importDescriptorArray = $this->getImageImportDescriptors();
+
+        $dllnameArray = array();
+        foreach ($importDescriptorArray as $key => $import)
+        {
+            // move to offset of dll name
+            $this->_streamio->read(0, $import->name);
+
+            $dllname = '';
+            while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
+                $dllname .= $word;
+
+            $dllnameArray[$key] = $dllname;
+        }
+
+        return $dllnameArray;
     }
 }
 ?>
