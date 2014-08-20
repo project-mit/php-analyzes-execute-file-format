@@ -15,8 +15,8 @@ abstract class AbstractStreamIO
         unset($this->_analysis);
     }
 
-    abstract public function read($length, $offset = 0, $whence = SEEK_CUR);
-    abstract public function write(string $buffer, $offset = 0, $whence = SEEK_CUR);
+    abstract public function read($length, $offset = -1, $whence = SEEK_SET);
+    abstract public function write(string $buffer, $offset = -1, $whence = SEEK_SET);
 
     abstract public function toString();
     abstract public function toInteger();

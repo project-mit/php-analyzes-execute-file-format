@@ -20,14 +20,14 @@ class BinaryIO extends AbstractStreamIO
         parent::__destruct();
     }
 
-    public function read($length, $offset = 0, $whence = SEEK_CUR)
+    public function read($length, $offset = -1, $whence = SEEK_SET)
     {
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
 
         return $this;
     }
 
-    public function write(string $buffer, $offset = 0, $whence = SEEK_CUR)
+    public function write(string $buffer, $offset = -1, $whence = SEEK_SET)
     {
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);
 
