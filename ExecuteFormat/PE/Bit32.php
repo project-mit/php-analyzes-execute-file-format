@@ -21,8 +21,9 @@ class Bit32 extends AbstractExecuteFormat
     public function getImageDosHeader()
     {
         $header = new ImageDosHeader();
-        $header->magic = $this->_streamio->read(2)->toString();
+        $header->magic = $this->_streamio->read(2, 0)->toString();
         $header->cblp = $this->_streamio->read(2)->toInteger();
+        $header->cp = $this->_streamio->read(2)->toInteger();
         $header->crlc = $this->_streamio->read(2)->toInteger();
         $header->cparhdr = $this->_streamio->read(2)->toInteger();
         $header->minalloc = $this->_streamio->read(2)->toInteger();
@@ -39,6 +40,73 @@ class Bit32 extends AbstractExecuteFormat
         $header->oeminfo = $this->_streamio->read(2)->toInteger();
         $header->reservd2 = $this->_streamio->read(2 * 10)->toIntArray(2);
         $header->lfanew = $this->_streamio->read(4)->toInteger();
+
+        return $header;
+    }
+
+    public function getImageNtHeaders(ImageDosHeader $dosHeader = null)
+    {
+        // This method is needing to IMAGE_DOS_HEADER and
+        // IMAGE_NT_HEADERS(IMAGE_FILE_HEADER and IMAGE_OPTIONAL_HEADER)
+        if ($dosHeader === null)
+            $dosHeader = $this->getImageDosHeader();
+
+        $header = new ImageNtHeaders();
+
+        // move to IMAGE_NT_HEADER's offset of file
+        $header->signature = $this->_streamio->read(4, $dosHeader->lfanew)->toString();
+
+        // get IMAGE_FILE_HEADER
+        $header->fileheader->machine = $this->_streamio->read(2)->toInteger();
+        $header->fileheader->numberOfSections = $this->_streamio->read(2)->toInteger();
+        $header->fileheader->timeDateStamp = $this->_streamio->read(4)->toInteger();
+        $header->fileheader->pointerToSymbolTable = $this->_streamio->read(4)->toInteger();
+        $header->fileheader->numberOfSymbols = $this->_streamio->read(4)->toInteger();
+        $header->fileheader->sizeOfOptionalHeader = $this->_streamio->read(2)->toInteger();
+        $header->fileheader->characteristics = $this->_streamio->read(2)->toInteger();
+
+        // get IMAGE_OPTIONAL_HEADER
+        // The size of IMAGE_OPTIONAL_HEADER is put into `$header->fileheader->sizeOfOptionalHeader`.
+
+        // The magic parameter of IMAGE_OPTIONAL_HEADER is 0x10B to 32bit mode of operating system.
+        // This parameger on 64bit mode of operating system is 0x20B.
+        $header->optionalheader->magic = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->majorLinkerVersion = $this->_streamio->read(1)->toInteger();
+        $header->optionalheader->minorLinkerVersion = $this->_streamio->read(1)->toInteger();
+        $header->optionalheader->sizeOfCode = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfInitializedData = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfUninitializedData = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->addressOfEntryPoint = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->baseOfCode = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->baseOfData = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->imageBase = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sectionAlignment = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->fileAlignment = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->majorOperatingSystemVersion = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->minorOperatingSystemVersion = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->majorImageVersion = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->minorImageVersion = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->majorSubsystemVersion = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->minorSubsystemVersion = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->win32VersionValue = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfImage = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfHeaders = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->checksum = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->subsystem = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->dllCharacteristics = $this->_streamio->read(2)->toInteger();
+        $header->optionalheader->sizeOfStackReserve = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfStackCommit = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfHeapReserve = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->sizeOfHeapCommit = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->loaderFlags = $this->_streamio->read(4)->toInteger();
+        $header->optionalheader->numberOfRvaAndSizes = $this->_streamio->read(4)->toInteger();
+
+        for ($i = 0; $i < $header->optionalheader->numberOfRvaAndSizes; $i++)
+        {
+            $header->optionalheader->dataDirectory[$i] = new ImageDataDirectory();
+            $header->optionalheader->dataDirectory[$i]->virtualAddress = $this->_streamio->read(4)->toInteger();
+            $header->optionalheader->dataDirectory[$i]->size = $this->_streamio->read(4)->toInteger();
+        }
 
         return $header;
     }

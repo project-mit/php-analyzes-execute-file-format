@@ -5,6 +5,11 @@ class ImageOptionalHeader
 {
     const IMAGE_NUMBEROF_DIRECTORY_ENTRIES = 16;
 
+    // define of subsystem type
+    const SUBSYSTEM_NATIVE = 1;
+    const SUBSYSTEM_WINDOWS_GUI = 2;
+    const SUBSYSTEM_WINDOWS_CUI = 3;
+
     public $magic;
     public $majorLinkerVersion;
     public $minorLinkerVersion;
@@ -39,7 +44,6 @@ class ImageOptionalHeader
 
     public function __construct()
     {
-        $this->dataDirectory = array_fill(0, self::IMAGE_NUMBEROF_DIRECTORY_ENTRIES, new ImageDataDirectory());
     }
 
     public function __destruct()
