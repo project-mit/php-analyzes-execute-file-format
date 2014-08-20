@@ -12,8 +12,11 @@ try
 
     $dosHeader = $pe->getImageDosHeader();
     $ntHeader = $pe->getImageNtHeaders($dosHeader);
+    $sectionHeader = $pe->getImageSectionHeader($ntHeader);
+
     print_r($dosHeader);
     print_r($ntHeader);
+    print_r($sectionHeader);
 }
 catch (Exception $e)
 {

@@ -44,9 +44,9 @@ class Bit32 extends AbstractExecuteFormat
         return $header;
     }
 
-    public function getImageNtHeaders(ImageDosHeader $dosHeader = null)
+    public function getImageNtHeaders(ImageDosHeader &$dosHeader = null)
     {
-        // This method is needing to IMAGE_DOS_HEADER and
+        // This method is needing to define of IMAGE_DOS_HEADER and
         // IMAGE_NT_HEADERS(IMAGE_FILE_HEADER and IMAGE_OPTIONAL_HEADER)
         if ($dosHeader === null)
             $dosHeader = $this->getImageDosHeader();
@@ -109,6 +109,36 @@ class Bit32 extends AbstractExecuteFormat
         }
 
         return $header;
+    }
+
+    public function getImageSectionHeader(ImageNtHeaders &$ntHeader = null)
+    {
+        // This method is needing to define of IMAGE_NT_HEADERS(IMAGE_FILE_HEADER and IMAGE_OPTIONAL_HEADER).
+        if ($ntHeader === null)
+            $ntHeader = $this->getImageNtHeaders();
+
+        $headerArray = array();
+        for ($i = 0; $i < $ntHeader->fileheader->numberOfSections; $i++)
+        {
+            $header = new ImageSectionHeader();
+            $header->name = $this->_streamio->read($header::IMAGE_SIZEOF_SHORT_NAME)->toString();
+
+            $header->misc['physicalAddress'] = $this->_streamio->read(4)->toInteger();
+            $header->misc['virtualSize'] = $header->misc['physicalAddress'];
+
+            $header->virtualAddress = $this->_streamio->read(4)->toInteger();
+            $header->sizeOfRawData = $this->_streamio->read(4)->toInteger();
+            $header->pointerToRawData = $this->_streamio->read(4)->toInteger();
+            $header->pointerToRelocations = $this->_streamio->read(4)->toInteger();
+            $header->pointerToLineNumbers = $this->_streamio->read(4)->toInteger();
+            $header->numberOfRelocations = $this->_streamio->read(2)->toInteger();
+            $header->numberOfLineNumbers = $this->_streamio->read(2)->toInteger();
+            $header->characteristics = $this->_streamio->read(4)->toInteger();
+
+            $headerArray[$i] = $header;
+        }
+
+        return $headerArray;
     }
 }
 ?>
