@@ -41,18 +41,5 @@ class ImageOptionalHeader
     public $loaderFlags;
     public $numberOfRvaAndSizes;
     public $dataDirectory = null;
-
-    public function __construct()
-    {
-    }
-
-    public function __destruct()
-    {
-        foreach ($this->dataDirectory as $key => $value)
-        {
-            unset($this->dataDirectory[$key]);
-        }
-        unset($this->dataDirectory);
-    }
 }
 ?>

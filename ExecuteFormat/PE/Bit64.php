@@ -104,7 +104,7 @@ class Bit64 extends AbstractExecuteFormat
         $header->optionalheader->loaderFlags = $this->_streamio->read(4)->toInteger();
         $header->optionalheader->numberOfRvaAndSizes = $this->_streamio->read(4)->toInteger();
 
-        for ($i = 0; $i < $header->optionalheader->numberOfRvaAndSizes; $i++)
+        for ($i = 0; $i < ImageOptionalHeader::IMAGE_NUMBEROF_DIRECTORY_ENTRIES; $i++)
         {
             $header->optionalheader->dataDirectory[$i] = new ImageDataDirectory();
             $header->optionalheader->dataDirectory[$i]->virtualAddress = $this->_streamio->read(4)->toInteger();
