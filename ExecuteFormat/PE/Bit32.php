@@ -8,6 +8,8 @@ use AnalyzesExecuteFileFormat\ExecuteFormat\AbstractExecuteFormat;
 
 class Bit32 extends AbstractExecuteFormat
 {
+    private $rvaSectionArray = [];
+
     public function __construct(AbstractStreamIO &$streamio)
     {
         parent::__construct($streamio);
@@ -155,8 +157,11 @@ class Bit32 extends AbstractExecuteFormat
         if ($sectionHeader === null)
             $sectionHeader = $this->getImageSectionHeader($ntHeader);
 
+        // target section directory header
+        $targetDirectory = ImageDataDirectory::IMPORT_DIRECTORY;
+
         // get value to RVA of import address table
-        $iatInfo = $ntHeader->optionalheader->dataDirectory[ImageDataDirectory::IMPORT_DIRECTORY];
+        $iatInfo = $ntHeader->optionalheader->dataDirectory[$targetDirectory];
         foreach ($sectionHeader as $index => $section)
         {
             if ($iatInfo->virtualAddress >= $section->virtualAddress &&
@@ -173,15 +178,15 @@ class Bit32 extends AbstractExecuteFormat
                 {
                     $importDescriptor = new ImageImportDescriptor();
                     $importDescriptor->dummyUnionName['characteristics'] = $this->_streamio->read(4)->toInteger();
-                    $importDescriptor->dummyUnionName['originalFirstThunk'] = $importDescriptor->dummyUnionName['characteristics'];
+                    $importDescriptor->dummyUnionName['ordiginalFirstThunk'] = $importDescriptor->dummyUnionName['characteristics'];
                     $importDescriptor->timeDateStamp = $this->_streamio->read(4)->toInteger();
                     $importDescriptor->forwarderChain = $this->_streamio->read(4)->toInteger();
                     $importDescriptor->name = $this->_streamio->read(4)->toInteger();
                     $importDescriptor->firstThunk = $this->_streamio->read(4)->toInteger();
 
                     // RVA -> RAW
-                    $importDescriptor->dummyUnionName['originalFirstThunk'] -= $section->virtualAddress;
-                    $importDescriptor->dummyUnionName['originalFirstThunk'] += $section->pointerToRawData;
+                    $importDescriptor->dummyUnionName['ordiginalFirstThunk'] -= $section->virtualAddress;
+                    $importDescriptor->dummyUnionName['ordiginalFirstThunk'] += $section->pointerToRawData;
                     $importDescriptor->name -= $section->virtualAddress;
                     $importDescriptor->name += $section->pointerToRawData;
                     $importDescriptor->firstThunk -= $section->virtualAddress;
@@ -190,13 +195,19 @@ class Bit32 extends AbstractExecuteFormat
                     $importDescriptorArray[$i] = $importDescriptor;
                 }
 
+                // RVA -> RAW need to section information
+                $this->rvaSectionArray[$targetDirectory] = [
+                    'virtualAddress' => $section->virtualAddress,
+                    'pointerToRawData' => $section->pointerToRawData
+                ];
+
                 return $importDescriptorArray;
             }
         }
         return null;
     }
 
-    public function getListOfImportDLL(array &$importDescriptorArray = null)
+    public function getListOfImportDLL(array $importDescriptorArray = null)
     {
         if ($importDescriptorArray === null)
             $importDescriptorArray = $this->getImageImportDescriptors();
@@ -207,14 +218,112 @@ class Bit32 extends AbstractExecuteFormat
             // move to offset of dll name
             $this->_streamio->read(0, $import->name);
 
+            $dllnameArray[$key] = '';
+            while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
+                $dllnameArray[$key] .= $word;
+        }
+
+        return $dllnameArray;
+    }
+
+    public function getListOfImportFunction(array $importDescriptorArray = null)
+    {
+        if ($importDescriptorArray === null)
+            $importDescriptorArray = $this->getImageImportDescriptors();
+
+        // target section directory header
+        $targetDirectory = ImageDataDirectory::IMPORT_DIRECTORY;
+
+        $functionArray = array();
+        $rawInfo = $this->rvaSectionArray[$targetDirectory];
+        foreach ($importDescriptorArray as $key => $import)
+        {
+            // move to offset of dll name
+            $this->_streamio->read(0, $import->name);
+
             $dllname = '';
             while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
                 $dllname .= $word;
 
-            $dllnameArray[$key] = $dllname;
+            $importThunkDataArray = array();
+            // move to offset of dll into functions name
+            for ($i = 0; ($importThunkData = $this->_streamio->read(4, $import->firstThunk + $i * 4)->toInteger()) !== 0; $i++)
+            {
+                $importThunk = new ImageThunkData();
+                $importByName = new ImageImportByName();
+                $importByName->hint = 0;
+                $importByName->name = 0;
+                
+                // if MSB of $importThunkData is set, the value of IMAGE_THUNK_DATA is used to method of `ordinal`.
+                if (($importThunkData >> (4 * 8 - 1)) === 0b1)
+                {
+                    $importByName->name = $importThunkData & 0x0000ffff;
+                }
+                else
+                {
+                    $importThunk->u1['forwarderString'] = $importThunkData;
+                    $importThunk->u1['function'] = &$importThunk->u1['forwarderString'];
+                    $importThunk->u1['ordinal'] = &$importThunk->u1['forwarderString'];
+                    $importThunk->u1['addressOfData'] = &$importThunk->u1['forwarderString'];
+
+                    // get to IMAGE_IMPORT_BY_NAME
+                    $importThunk->u1['addressOfData'] -= $rawInfo['virtualAddress'];
+                    $importThunk->u1['addressOfData'] += $rawInfo['pointerToRawData'];
+
+                    // move to offset of IMAGE_IMPORT_BY_NAME
+                    $importByName->hint = $this->_streamio->read(2, $importThunk->u1['addressOfData'])->toInteger();
+                    $importByName->name = '';
+                    while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
+                        $importByName->name .= $word;
+                }
+                $importThunkDataArray[] = [
+                    'importByName' => $importByName,
+                    'importThunk' => $importThunk
+                ];
+            }
+
+            $functionArray[$key] = $importThunkDataArray;
         }
 
-        return $dllnameArray;
+        return $functionArray;
+    }
+
+    public function getProcAddress($dllname, $funcname, array &$dllArray = null, array &$functionArray = null)
+    {
+        if ($dllArray === null)
+            $dllArray = $this->getListOfImportDLL();
+
+        if ($functionArray === null)
+            $functionArray = $this->getListOfImportFunction();
+
+        // target section directory header
+        $targetDirectory = ImageDataDirectory::IMPORT_DIRECTORY;
+
+        $rawInfo = $this->rvaSectionArray[$targetDirectory];
+        foreach ($dllArray as $dllIndex => $dll)
+        {
+            if ($dll === $dllname)
+            {
+                foreach ($functionArray[$dllIndex] as $funcIndex => $function)
+                {
+                    if (is_string($function['importByName']->name) === true)
+                    {
+                        if ($function['importByName']->name === $funcname)
+                        {
+                            return $function['importThunk']->u1['function'];
+                        }
+                    }
+                    /*
+                    else
+                    {
+                        // NotSupported
+                        // $dllname -> pe analyzes -> Export Address Table
+                    }
+                    */
+                }
+                return null;
+            }
+        }
     }
 }
 ?>
