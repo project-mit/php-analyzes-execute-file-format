@@ -149,6 +149,112 @@ class Bit32 extends AbstractExecuteFormat
         return $headerArray;
     }
 
+    public function getImageExportDescriptor(ImageNtHeaders &$ntHeader = null, array &$sectionHeader = null)
+    {
+        if ($ntHeader === null)
+            $ntHeader = $this->getImageNtHeaders();
+
+        if ($sectionHeader === null)
+            $sectionHeader = $this->getImageSectionHeader($ntHeader);
+
+        // target section directory header
+        $targetDirectory = ImageDataDirectory::EXPORT_DIRECTORY;
+
+        // get value to RVA of export address table
+        $targetInfo = $ntHeader->optionalheader->dataDirectory[$targetDirectory];
+        foreach ($sectionHeader as $index => $section)
+        {
+            if ($targetInfo->virtualAddress >= $section->virtualAddress &&
+                $targetInfo->virtualAddress <  $section->virtualAddress + $section->misc['virtualSize'])
+            {
+                // move file offset to Export Address Table
+                $targetRAW = $targetInfo->virtualAddress - $section->virtualAddress + $section->pointerToRawData;
+
+                // get to length of Export Address Table
+                $targetDescriptor = new ImageExportDescriptor();
+                $targetDescriptor->characteristics = $this->_streamio->read(4, $targetRAW)->toInteger();
+                $targetDescriptor->timeDateStamp = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->majorVersion = $this->_streamio->read(2)->toInteger();
+                $targetDescriptor->minorVersion = $this->_streamio->read(2)->toInteger();
+                $targetDescriptor->name = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->base = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->numberOfFunctions = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->numberOfNames = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->addressOfFunctions = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->addressOfNames = $this->_streamio->read(4)->toInteger();
+                $targetDescriptor->addressOfNameOrdinals = $this->_streamio->read(4)->toInteger();
+
+                $targetDescriptor->name -= $section->virtualAddress;
+                $targetDescriptor->name += $section->pointerToRawData;
+                $targetDescriptor->addressOfNames -= $section->virtualAddress;
+                $targetDescriptor->addressOfNames += $section->pointerToRawData;
+
+                // RVA -> RAW need to section information
+                $this->rvaSectionArray[$targetDirectory] = [
+                    'virtualAddress' => $section->virtualAddress,
+                    'pointerToRawData' => $section->pointerToRawData
+                ];
+
+                return $targetDescriptor;
+            }
+        }
+        return new ImageExportDescriptor();
+    }
+
+    public function getListOfExportFileName(ImageExportDescriptor &$exportDescriptor = null)
+    {
+        if ($exportDescriptor === null)
+            $exportDescriptor = $this->getImageExportDescriptors();
+
+        if ($exportDescriptor->name == 0) return '';
+
+        // move to offset of dll name
+        $this->_streamio->read(0, $exportDescriptor->name);
+
+        $dllname = '';
+        while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
+            $dllname .= $word;
+
+        $dllname = strtolower($dllname);
+
+        return $dllname;
+    }
+
+    public function getListOfExportFunction(ImageExportDescriptor &$exportDescriptor = null)
+    {
+        if ($exportDescriptor === null)
+            $exportDescriptor = $this->getImageExportDescriptors();
+
+        // target section directory header
+        $targetDirectory = ImageDataDirectory::EXPORT_DIRECTORY;
+
+        $functionArray = array();
+        $rawInfo = $this->rvaSectionArray[$targetDirectory];
+        for ($i = 0; $i < $exportDescriptor->numberOfNames; $i++)
+        {
+            $funcnameAddress = $this->_streamio->read(4, $exportDescriptor->addressOfNames + $i * 4)->toInteger();
+            $funcnameAddress -= $rawInfo['virtualAddress'];
+            $funcnameAddress += $rawInfo['pointerToRawData'];
+            $this->_streamio->read(0, $funcnameAddress);
+
+            $funcname = '';
+            while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
+                $funcname .= $word;
+
+            $funcOrdinal = $this->_streamio->read(2, $exportDescriptor->addressOfNameOrdinals + $i * 2)->toInteger();
+
+            $funcAddress = $this->_streamio->read(4, $exportDescriptor->addressOfFunctions + $i * 4)->toInteger();
+
+            $functionArray[] = [
+                'ordinal' => $funcOrdinal,
+                'function' => $funcname,
+                'address' => $funcAddress
+            ];
+        }
+
+        return $functionArray;
+    }
+
     public function getImageImportDescriptors(ImageNtHeaders &$ntHeader = null, array &$sectionHeader = null)
     {
         if ($ntHeader === null)
@@ -161,38 +267,38 @@ class Bit32 extends AbstractExecuteFormat
         $targetDirectory = ImageDataDirectory::IMPORT_DIRECTORY;
 
         // get value to RVA of import address table
-        $iatInfo = $ntHeader->optionalheader->dataDirectory[$targetDirectory];
+        $targetInfo = $ntHeader->optionalheader->dataDirectory[$targetDirectory];
         foreach ($sectionHeader as $index => $section)
         {
-            if ($iatInfo->virtualAddress >= $section->virtualAddress &&
-                $iatInfo->virtualAddress <  $section->virtualAddress + $section->misc['virtualSize'])
+            if ($targetInfo->virtualAddress >= $section->virtualAddress &&
+                $targetInfo->virtualAddress <  $section->virtualAddress + $section->misc['virtualSize'])
             {
                 // move file offset to Import Address Table
-                $iatRAW = $iatInfo->virtualAddress - $section->virtualAddress + $section->pointerToRawData;
-                $this->_streamio->read(0, $iatRAW);
+                $targetRAW = $targetInfo->virtualAddress - $section->virtualAddress + $section->pointerToRawData;
+                $this->_streamio->read(0, $targetRAW);
 
                 // get to length of Import Address Table
-                $iatSections = $iatInfo->size / 20 - 1;
-                $importDescriptorArray = array();
-                for ($i = 0; $i < $iatSections; $i++)
+                $targetSections = $targetInfo->size / 20 - 1;
+                $targetDescriptorArray = array();
+                for ($i = 0; $i < $targetSections; $i++)
                 {
-                    $importDescriptor = new ImageImportDescriptor();
-                    $importDescriptor->dummyUnionName['characteristics'] = $this->_streamio->read(4)->toInteger();
-                    $importDescriptor->dummyUnionName['ordiginalFirstThunk'] = $importDescriptor->dummyUnionName['characteristics'];
-                    $importDescriptor->timeDateStamp = $this->_streamio->read(4)->toInteger();
-                    $importDescriptor->forwarderChain = $this->_streamio->read(4)->toInteger();
-                    $importDescriptor->name = $this->_streamio->read(4)->toInteger();
-                    $importDescriptor->firstThunk = $this->_streamio->read(4)->toInteger();
+                    $targetDescriptor = new ImageImportDescriptor();
+                    $targetDescriptor->dummyUnionName['characteristics'] = $this->_streamio->read(4)->toInteger();
+                    $targetDescriptor->dummyUnionName['ordiginalFirstThunk'] = $targetDescriptor->dummyUnionName['characteristics'];
+                    $targetDescriptor->timeDateStamp = $this->_streamio->read(4)->toInteger();
+                    $targetDescriptor->forwarderChain = $this->_streamio->read(4)->toInteger();
+                    $targetDescriptor->name = $this->_streamio->read(4)->toInteger();
+                    $targetDescriptor->firstThunk = $this->_streamio->read(4)->toInteger();
 
                     // RVA -> RAW
-                    $importDescriptor->dummyUnionName['ordiginalFirstThunk'] -= $section->virtualAddress;
-                    $importDescriptor->dummyUnionName['ordiginalFirstThunk'] += $section->pointerToRawData;
-                    $importDescriptor->name -= $section->virtualAddress;
-                    $importDescriptor->name += $section->pointerToRawData;
-                    $importDescriptor->firstThunk -= $section->virtualAddress;
-                    $importDescriptor->firstThunk += $section->pointerToRawData;
+                    $targetDescriptor->dummyUnionName['ordiginalFirstThunk'] -= $section->virtualAddress;
+                    $targetDescriptor->dummyUnionName['ordiginalFirstThunk'] += $section->pointerToRawData;
+                    $targetDescriptor->name -= $section->virtualAddress;
+                    $targetDescriptor->name += $section->pointerToRawData;
+                    $targetDescriptor->firstThunk -= $section->virtualAddress;
+                    $targetDescriptor->firstThunk += $section->pointerToRawData;
 
-                    $importDescriptorArray[$i] = $importDescriptor;
+                    $targetDescriptorArray[$i] = $targetDescriptor;
                 }
 
                 // RVA -> RAW need to section information
@@ -201,10 +307,10 @@ class Bit32 extends AbstractExecuteFormat
                     'pointerToRawData' => $section->pointerToRawData
                 ];
 
-                return $importDescriptorArray;
+                return $targetDescriptorArray;
             }
         }
-        return null;
+        return array();
     }
 
     public function getListOfImportDLL(array $importDescriptorArray = null)

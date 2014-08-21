@@ -20,6 +20,7 @@ require(__DIR__ . '/ExecuteFormat/PE/ImageSectionHeader.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageImportDescriptor.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageImportByName.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageThunkData.php');
+require(__DIR__ . '/ExecuteFormat/PE/ImageExportDescriptor.php');
 require(__DIR__ . '/ExecuteFormat/PE/Bit32.php');
 require(__DIR__ . '/ExecuteFormat/PE/Bit64.php');
 // ExecuteFormat\ELF Classes

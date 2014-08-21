@@ -82,17 +82,18 @@ class FileIO extends AbstractStreamIO
     public function toInteger()
     {
         $binary = $this->__data;
-        $binarylength = strlen($binary);
 
-        // if $binary[1] was not defined, size of $binary is 1.
-        if (isset($binary[1]) === false)
-            return ord($binary);
-        else
-        {
-            $endian = ($this->__endian === self::LITTLE_ENDIAN)? 'v': 'n';
-            $endian = (isset($binary[2]) === false)? $endian: strtoupper($endian);
-        }
-        return unpack($endian . '*', $binary)[1];
+        $binary = str_split($binary);
+        $binary = array_map(
+            function ($value)
+            {
+                return sprintf('%02x', ord($value));
+            },
+            $binary
+        );
+
+        $binary = array_reverse($binary);
+        return hexdec(implode('', $binary));
     }
 
     public function toIntArray($valueSize = 1)
