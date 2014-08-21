@@ -221,6 +221,8 @@ class Bit32 extends AbstractExecuteFormat
             $dllnameArray[$key] = '';
             while (($word = $this->_streamio->read(1)->toString()) !== "\x00")
                 $dllnameArray[$key] .= $word;
+
+            $dllnameArray[$key] = strtolower($dllnameArray[$key]);
         }
 
         return $dllnameArray;

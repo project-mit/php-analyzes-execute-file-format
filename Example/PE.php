@@ -7,10 +7,10 @@ use AnalyzesExecuteFileFormat\Lib\StreamIO\FileIO;
 use AnalyzesExecuteFileFormat\ExecuteFormat\PE\Bit32;
 use AnalyzesExecuteFileFormat\ExecuteFormat\PE\Bit64;
 
+echo '<xmp>';
 try
 {
-    //$pe = new Bit32(new FileIO(fopen('/var/ftp/pub/procexp.exe', 'r')));
-    $pe = new Bit64(new FileIO(fopen('/var/ftp/pub/libmysql.dll', 'r')));
+    $pe = new Bit32(new FileIO(fopen('procexp.exe', 'r')));
 
     $dosHeader = $pe->getImageDosHeader();
     $ntHeader = $pe->getImageNtHeaders($dosHeader);
@@ -19,7 +19,7 @@ try
     $dllnameArray = $pe->getListOfImportDLL($importDescriptorArray);
     $funcionArray = $pe->getListOfImportFunction($importDescriptorArray);
 
-    echo $pe->getProcAddress('KERNEL32.dll', 'FormatMessageA');
+    echo 'GetProcAddress(kernel32.FormatMessageA) = ' . $pe->getProcAddress('kernel32.dll', 'FormatMessageA') . "\n";
 
     //print_r($dosHeader);
     //print_r($ntHeader);
@@ -32,4 +32,5 @@ catch (Exception $e)
 {
     echo $e->getMessage();
 }
+echo '</xmp>';
 ?>
