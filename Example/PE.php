@@ -10,8 +10,7 @@ use AnalyzesExecuteFileFormat\ExecuteFormat\PE\Bit64;
 echo '<xmp>';
 try
 {
-    //$pe = new Bit32(new FileIO(fopen('/var/ftp/pub/procexp.exe', 'r')));
-    $pe = new Bit64(new FileIO(fopen('/var/ftp/pub/libmysql.dll', 'r')));
+    $pe = new Bit32(new FileIO(fopen('procexp.exe', 'r')));
 
     $dosHeader = $pe->getImageDosHeader();
     $ntHeader = $pe->getImageNtHeaders($dosHeader);
