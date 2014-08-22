@@ -4,13 +4,13 @@ require('../Core.php');
 use AnalyzesExecuteFileFormat\Exception\NotSupportException;
 
 use AnalyzesExecuteFileFormat\Lib\StreamIO\FileIO;
-use AnalyzesExecuteFileFormat\ExecuteFormat\PE\Bit32;
-use AnalyzesExecuteFileFormat\ExecuteFormat\PE\Bit64;
+use AnalyzesExecuteFileFormat\ExecuteFormat\PE\ExecuteFormat;
 
 echo '<xmp>';
 try
 {
-    $pe = new Bit32(new FileIO(fopen('procexp.exe', 'r')));
+    $executeObject = new ExecuteFormat(new FileIO(fopen('procexp.exe', 'r')));
+    $pe = $executeObject->getObjectFromBitMode();
 
     $dosHeader = $pe->getImageDosHeader();
     $ntHeader = $pe->getImageNtHeaders($dosHeader);

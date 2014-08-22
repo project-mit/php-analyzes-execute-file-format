@@ -23,6 +23,7 @@ require(__DIR__ . '/ExecuteFormat/PE/ImageThunkData.php');
 require(__DIR__ . '/ExecuteFormat/PE/ImageExportDescriptor.php');
 require(__DIR__ . '/ExecuteFormat/PE/Bit32.php');
 require(__DIR__ . '/ExecuteFormat/PE/Bit64.php');
+require(__DIR__ . '/ExecuteFormat/PE/ExecuteFormat.php');
 // ExecuteFormat\ELF Classes
 require(__DIR__ . '/ExecuteFormat/ELF/Bit32.php');
 require(__DIR__ . '/ExecuteFormat/ELF/Bit64.php');

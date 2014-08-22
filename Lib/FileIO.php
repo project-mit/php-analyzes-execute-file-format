@@ -92,7 +92,9 @@ class FileIO extends AbstractStreamIO
             $binary
         );
 
-        $binary = array_reverse($binary);
+        if ($this->__endian === self::LITTLE_ENDIAN)
+            $binary = array_reverse($binary);
+
         return hexdec(implode('', $binary));
     }
 
