@@ -16,6 +16,9 @@ class ExecuteFormat
 
     public function __construct(AbstractStreamIO &$streamio)
     {
+        if (version_compare(PHP_VERSION, '5.4.0') < 0)
+            throw new NotSupportException('of PHP_VERSION(' . PHP_VERSION . ')');
+
         $this->_streamio = $streamio;
     }
 
