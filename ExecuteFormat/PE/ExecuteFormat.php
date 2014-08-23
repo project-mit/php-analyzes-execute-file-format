@@ -1,4 +1,11 @@
 <?php
+/**
+ * For the full copyright and license information, please view the LICENSE file
+ * that was distributed with this source code.
+ *
+ * @copyright ProJectMIT
+ * @license   http://www.opensource.org/licenses/MIT-License MIT License
+ */
 namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
 
 use AnalyzesExecuteFileFormat\Exception\NotSupportException,

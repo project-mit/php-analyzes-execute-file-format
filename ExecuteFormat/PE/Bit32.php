@@ -275,20 +275,26 @@ class Bit32 extends AbstractExecuteFormat
             {
                 // move file offset to Import Address Table
                 $targetRAW = $targetInfo->virtualAddress - $section->virtualAddress + $section->pointerToRawData;
-                $this->_streamio->read(0, $targetRAW);
 
-                // get to length of Import Address Table
-                $targetSections = $targetInfo->size / 20 - 1;
                 $targetDescriptorArray = array();
-                for ($i = 0; $i < $targetSections; $i++)
+                for ($i = 0; ; $i++)
                 {
                     $targetDescriptor = new ImageImportDescriptor();
-                    $targetDescriptor->dummyUnionName['characteristics'] = $this->_streamio->read(4)->toInteger();
+                    $targetDescriptor->dummyUnionName['characteristics'] = $this->_streamio->read(4, $targetRAW + $i * 20)->toInteger();
                     $targetDescriptor->dummyUnionName['ordiginalFirstThunk'] = $targetDescriptor->dummyUnionName['characteristics'];
                     $targetDescriptor->timeDateStamp = $this->_streamio->read(4)->toInteger();
                     $targetDescriptor->forwarderChain = $this->_streamio->read(4)->toInteger();
                     $targetDescriptor->name = $this->_streamio->read(4)->toInteger();
                     $targetDescriptor->firstThunk = $this->_streamio->read(4)->toInteger();
+
+                    $endOfDescriptor  = $targetDescriptor->dummyUnionName['ordiginalFirstThunk'];
+                    $endOfDescriptor += $targetDescriptor->timeDateStamp;
+                    $endOfDescriptor += $targetDescriptor->forwarderChain;
+                    $endOfDescriptor += $targetDescriptor->name;
+                    $endOfDescriptor += $targetDescriptor->firstThunk;
+                    // if value of `$endOfDescriptor` is zero, end-of-structure.
+                    if ($endOfDescriptor === 0)
+                        break;
 
                     // RVA -> RAW
                     $targetDescriptor->dummyUnionName['ordiginalFirstThunk'] -= $section->virtualAddress;
@@ -298,7 +304,7 @@ class Bit32 extends AbstractExecuteFormat
                     $targetDescriptor->firstThunk -= $section->virtualAddress;
                     $targetDescriptor->firstThunk += $section->pointerToRawData;
 
-                    $targetDescriptorArray[$i] = $targetDescriptor;
+                    $targetDescriptorArray[] = $targetDescriptor;
                 }
 
                 // RVA -> RAW need to section information
