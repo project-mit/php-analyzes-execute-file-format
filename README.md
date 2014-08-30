@@ -11,17 +11,21 @@ You have multiple ways to install php-analyzes-execute-file-format.
 ### Composer
 1. Install composer in your project : `curl -s http://getcomposer.org/installer | php`
 2. Create a composer.json file or update it in your project root : 
+
     ```javascript
     "require": {
         "projectmit/php-analyzes-execute-file-format" : "0.1.0"
     }
     ```
+
     or
+
     ```javascript
     "require": {
         "projectmit/php-analyzes-execute-file-format" : "dev-master"
     }
     ```
+
 3. Install via composer : `php composer.phar install`
 
 ## Licence
