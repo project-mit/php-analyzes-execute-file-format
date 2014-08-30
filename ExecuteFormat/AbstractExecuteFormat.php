@@ -3,7 +3,7 @@ namespace AnalyzesExecuteFileFormat\ExecuteFormat;
 
 use AnalyzesExecuteFileFormat\Exception\BadMethodCallException;
 
-use AnalyzesExecuteFileFormat\Lib\StreamIO\AbstractStreamIO;
+use AnalyzesExecuteFileFormat\Lib\AbstractStreamIO;
 
 class AbstractExecuteFormat
 {

@@ -1,5 +1,5 @@
 <?php
-namespace AnalyzesExecuteFileFormat\Lib\StreamIO;
+namespace AnalyzesExecuteFileFormat\Lib;
 
 use AnalyzesExecuteFileFormat\Exception\InvalidException,
     AnalyzesExecuteFileFormat\Exception\IOException;

@@ -1,15 +1,12 @@
 <?php
-require('../Core.php');
+require('../vendor/autoload.php');
 
-use AnalyzesExecuteFileFormat\Exception\NotSupportException;
-
-use AnalyzesExecuteFileFormat\Lib\StreamIO\FileIO;
-use AnalyzesExecuteFileFormat\ExecuteFormat\PE\ExecuteFormat;
+use AnalyzesExecuteFileFormat\ExecuteFormat\PE\Manager;
 
 echo '<xmp>';
 try
 {
-    $executeObject = new ExecuteFormat(new FileIO(fopen('procexp.exe', 'r')));
+    $executeObject = new Manager(fopen('procexp.exe', 'r'));
     $pe = $executeObject->getObjectFromBitMode();
 
     $dosHeader = $pe->getImageDosHeader();

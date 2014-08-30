@@ -11,22 +11,21 @@ namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
 use AnalyzesExecuteFileFormat\Exception\NotSupportException,
     AnalyzesExecuteFileFormat\Exception\IOException;
 
-use AnalyzesExecuteFileFormat\Lib\StreamIO\AbstractStreamIO;
-use AnalyzesExecuteFileFormat\ExecuteFormat\AbstractExecuteFormat;
+use AnalyzesExecuteFileFormat\Lib\FileIO;
 
-class ExecuteFormat
+class Manager
 {
     const OPERATING_SYSTEM_32BIT_MODE = 0x10b;
     const OPERATING_SYSTEM_64BIT_MODE = 0x20b;
 
     protected $_streamio = null;
 
-    public function __construct(AbstractStreamIO &$streamio)
+    public function __construct($streamio)
     {
         if (version_compare(PHP_VERSION, '5.4.0') < 0)
             throw new NotSupportException('of PHP_VERSION(' . PHP_VERSION . ')');
 
-        $this->_streamio = $streamio;
+        $this->_streamio = new FileIO($streamio);
     }
 
     public function __destruct()

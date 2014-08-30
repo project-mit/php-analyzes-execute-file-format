@@ -1,5 +1,5 @@
 <?php
-namespace AnalyzesExecuteFileFormat\Lib\StreamIO;
+namespace AnalyzesExecuteFileFormat\Lib;
 
 abstract class AbstractStreamIO
 {

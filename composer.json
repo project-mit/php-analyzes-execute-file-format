@@ -20,7 +20,7 @@
 
     "autoload": {
         "psr-4": {
-            "AnalyzesExecuteFileFormat\\": ["Exception/", "Lib/", "ExecuteFormat/"]
+            "AnalyzesExecuteFileFormat\\": ["."]
         }
     },
 

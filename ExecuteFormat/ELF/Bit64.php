@@ -3,12 +3,12 @@ namespace AnalyzesExecuteFileFormat\ExecuteFormat\ELF;
 
 use AnalyzesExecuteFileFormat\Exception\NotSupportException;
 
-use AnalyzesExecuteFileFormat\Lib\StreamIO\AbstractStreamIO;
+use AnalyzesExecuteFileFormat\Lib\AbstractStreamIO;
 use AnalyzesExecuteFileFormat\ExecuteFormat\AbstractExecuteFormat;
 
 class Bit64 extends AbstractExecuteFormat
 {
-    public function __construct(AbstractStreamIO $streamio)
+    public function __construct(&$streamio)
     {
         // not supported ELF 64bit mode
         throw new NotSupportException(__CLASS__ . '::' . __FUNCTION__);

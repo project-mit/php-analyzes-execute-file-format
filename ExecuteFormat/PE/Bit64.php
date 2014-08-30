@@ -3,7 +3,7 @@ namespace AnalyzesExecuteFileFormat\ExecuteFormat\PE;
 
 use AnalyzesExecuteFileFormat\Exception\NotSupportException;
 
-use AnalyzesExecuteFileFormat\Lib\StreamIO\AbstractStreamIO;
+use AnalyzesExecuteFileFormat\Lib\AbstractStreamIO;
 use AnalyzesExecuteFileFormat\ExecuteFormat\AbstractExecuteFormat;
 
 class Bit64 extends AbstractExecuteFormat
