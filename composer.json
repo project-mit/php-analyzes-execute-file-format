@@ -1,0 +1,33 @@
+{
+    "name": "projectmit/php-analyzes-execute-file-format",
+    "type": "library",
+    "description": "This project can analyzes for functions list of the Operating-System-Execute-File.",
+    "keywords": ["PE32", "PE64+", "PHP", "Portable Executable"],
+    "license": "MIT",
+    "homepage": "https://github.com/ProJectMIT/php-analyzes-execute-file-format",
+
+    "authors": [
+        {
+            "name": "Byoung Wook, Kim",
+            "email": "quddnr145@naver.com",
+            "role": "Project Founder"
+        }
+    ],
+
+    "require": {
+        "php": ">=5.4.0"
+    },
+
+    "autoload": {
+        "psr-4": {
+            "AnalyzesExecuteFileFormat\\": ["Exception/", "Lib/", "ExecuteFormat/"]
+        }
+    },
+
+    "config": {
+        "bin-dir": "bin"
+    },
+
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
