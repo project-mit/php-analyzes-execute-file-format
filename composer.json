@@ -2,7 +2,7 @@
     "name": "projectmit/php-analyzes-execute-file-format",
     "type": "library",
     "description": "This project can analyzes for functions list of the Operating-System-Execute-File.",
-    "keywords": ["PE32", "PE64+", "PHP", "Portable Executable"],
+    "keywords": ["PE32", "PE64", "PHP", "Portable Executable"],
     "license": "MIT",
     "homepage": "https://github.com/ProJectMIT/php-analyzes-execute-file-format",
 
