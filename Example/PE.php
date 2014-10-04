@@ -7,26 +7,26 @@ echo '<xmp>';
 try
 {
     $executeObject = new Manager(fopen('procexp.exe', 'r'));
-    $pe = $executeObject->getObjectFromBitMode();
+    $analyze = $executeObject->getObjectFromBitMode();
 
-    $dosHeader = $pe->getImageDosHeader();
-    $ntHeader = $pe->getImageNtHeaders($dosHeader);
-    $sectionHeader = $pe->getImageSectionHeader($ntHeader);
+    $dosHeader = $analyze->getImageDosHeader();
+    $ntHeader = $analyze->getImageNtHeaders($dosHeader);
+    $sectionHeader = $analyze->getImageSectionHeader($ntHeader);
 
     // export
-    $exportDescriptor = $pe->getImageExportDescriptor($ntHeader, $sectionHeader);
-    $exportDllname = $pe->getListOfExportFileName($exportDescriptor);
-    $exportFuncionArray = $pe->getListOfExportFunction($exportDescriptor);
+    $exportDescriptor = $analyze->getImageExportDescriptor($ntHeader, $sectionHeader);
+    $exportDllname = $analyze->getListOfExportFileName($exportDescriptor);
+    $exportFuncionArray = $analyze->getListOfExportFunction($exportDescriptor);
 
     var_dump($exportDllname);
     print_r($exportFuncionArray);
 
     // import
-    $importDescriptorArray = $pe->getImageImportDescriptors($ntHeader, $sectionHeader);
-    $importDllnameArray = $pe->getListOfImportDLL($importDescriptorArray);
-    $importFuncionArray = $pe->getListOfImportFunction($importDescriptorArray);
+    $importDescriptorArray = $analyze->getImageImportDescriptors($ntHeader, $sectionHeader);
+    $importDllnameArray = $analyze->getListOfImportDLL($importDescriptorArray);
+    $importFuncionArray = $analyze->getListOfImportFunction($importDescriptorArray);
 
-    echo 'GetProcAddress(kernel32.FormatMessageA) = ' . $pe->getProcAddress('kernel32.dll', 'FormatMessageA') . "\n";
+    echo 'GetProcAddress(kernel32.FormatMessageA) = ' . $analyze->getProcAddress('kernel32.dll', 'FormatMessageA') . "\n";
 
     print_r($importDllnameArray);
     print_r($importFuncionArray);
