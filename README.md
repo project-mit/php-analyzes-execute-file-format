@@ -1,4 +1,5 @@
-# php-analyzes-execute-file-format[![Latest Stable Version](https://poser.pugx.org/projectmit/php-analyzes-execute-file-format/v/stable.svg)](https://packagist.org/packages/projectmit/php-analyzes-execute-file-format)
+# php-analyzes-execute-file-format
+[![Latest Stable Version](https://poser.pugx.org/projectmit/php-analyzes-execute-file-format/v/stable.svg)](https://packagist.org/packages/projectmit/php-analyzes-execute-file-format)
 [![Total Downloads](https://poser.pugx.org/projectmit/php-analyzes-execute-file-format/downloads.svg)](https://packagist.org/packages/projectmit/php-analyzes-execute-file-format)
 [![Latest Unstable Version](https://poser.pugx.org/projectmit/php-analyzes-execute-file-format/v/unstable.svg)](https://packagist.org/packages/projectmit/php-analyzes-execute-file-format)
 [![License](https://poser.pugx.org/projectmit/php-analyzes-execute-file-format/license.svg)](https://packagist.org/packages/projectmit/php-analyzes-execute-file-format)
